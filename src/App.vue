@@ -1,11 +1,43 @@
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useAuthStore } from './stores/auth'
+import AuthView from './views/AuthView.vue'
+
+const authStore = useAuthStore()
+
+onMounted(() => {
+  authStore.initializeAuth()
+})
+</script>
+
 <template>
-  <div class="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6">
-    <div class="text-center space-y-4">
-      <h1 class="text-4xl font-extrabold tracking-tight text-emerald-400">Centimo</h1>
-      <p class="text-slate-400 text-lg">Vue 3 + Vite + TypeScript + Tailwind v4 is officially ready.</p>
-      <div class="inline-block bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg text-sm font-mono text-slate-300">
-        src/App.vue
-      </div>
+  <div class="min-h-screen" style="background: #111418">
+    <!-- Resolving session -->
+    <div
+      v-if="authStore.isLoading"
+      class="min-h-screen flex items-center justify-center"
+    >
+      <span class="text-sm" style="color: #8E8E93">Loading…</span>
+    </div>
+
+    <!-- Unauthenticated -->
+    <AuthView v-else-if="!authStore.user" />
+
+    <!-- Authenticated placeholder workspace -->
+    <div
+      v-else
+      class="min-h-screen flex flex-col items-center justify-center gap-6"
+    >
+      <h1 class="text-white text-2xl font-bold tracking-tight">
+        Welcome, {{ authStore.user.username }}!
+      </h1>
+      <button
+        @click="authStore.logout()"
+        class="px-6 py-2 rounded-xl text-white font-semibold text-sm transition active:scale-95 cursor-pointer"
+        style="background: #FF8A65"
+      >
+        Sign Out
+      </button>
     </div>
   </div>
 </template>
