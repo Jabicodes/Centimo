@@ -11,7 +11,7 @@ const incomeStore = useIncomeStore()
 onMounted(() => {
   expensesStore.fetchExpenses()
   expensesStore.fetchCategories()
-  incomeStore.fetchData()
+  incomeStore.fetchIncome()
 })
 
 // ── Greeting ──────────────────────────────────────────────────────────────────
