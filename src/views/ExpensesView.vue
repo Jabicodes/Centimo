@@ -11,12 +11,16 @@ const expenseDescription = ref('')
 const expenseDate = ref(new Date().toLocaleDateString('en-CA'))
 const activeFilter = ref('All')
 
-const categories = computed(() => expensesStore.categories)
+const categories = computed(() =>
+  expensesStore.categories.filter(
+    (cat) => !['education', 'health', 'housing'].includes(cat.name.toLowerCase()),
+  ),
+)
 
 onMounted(async () => {
   await Promise.all([expensesStore.fetchCategories(), expensesStore.fetchExpenses()])
-  if (expensesStore.categories.length > 0) {
-    selectedCategoryId.value = expensesStore.categories[0].id
+  if (categories.value.length > 0) {
+    selectedCategoryId.value = categories.value[0].id
   }
 })
 
@@ -25,7 +29,7 @@ const filteredExpenses = computed(() => {
   return expensesStore.expenses.filter((e) => e.categories?.name === activeFilter.value)
 })
 
-async function handleAddExpense() {
+const handleAddExpense = async () => {
   const amount = parseFloat(expenseAmount.value)
   if (isNaN(amount) || amount <= 0) return
   try {
@@ -45,7 +49,7 @@ async function handleAddExpense() {
   }
 }
 
-function formatCurrency(val: number): string {
+const formatCurrency = (val: number) => {
   return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(val)
 }
 </script>
@@ -54,7 +58,6 @@ function formatCurrency(val: number): string {
   <div class="min-h-screen text-white px-3 pt-4 pb-24 antialiased font-sans" style="background: #111418">
     <div class="max-w-md mx-auto space-y-4">
 
-      <!-- Header -->
       <header class="px-1 flex justify-between items-end">
         <div>
           <h1 class="text-xl font-bold tracking-tight">Expenses</h1>
@@ -62,7 +65,6 @@ function formatCurrency(val: number): string {
         </div>
       </header>
 
-      <!-- Input card -->
       <section class="bg-[#1A1D24] rounded-xl p-3 border border-[rgba(255,255,255,0.06)] space-y-3">
 
         <!-- Amount -->
@@ -81,13 +83,13 @@ function formatCurrency(val: number): string {
         <!-- Category grid -->
         <div class="space-y-1">
           <label class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] px-0.5">Select Category</label>
-          <div class="grid grid-cols-3 gap-1.5">
+          <div class="grid grid-cols-3 gap-1">
             <button
               v-for="cat in categories"
               :key="cat.id"
               type="button"
               @click="selectedCategoryId = cat.id"
-              class="flex flex-col items-center justify-center p-2 rounded-lg border text-center transition-all min-h-[52px] cursor-pointer"
+              class="flex flex-col items-center justify-center py-1.5 px-0.5 min-h-[44px] rounded-lg border text-center transition-all cursor-pointer"
               :class="
                 selectedCategoryId === cat.id
                   ? 'bg-[#FF8A65] border-[#FF8A65] text-[#111418]'
@@ -95,7 +97,7 @@ function formatCurrency(val: number): string {
               "
             >
               <span class="text-sm mb-0.5">{{ cat.icon || '🛍️' }}</span>
-              <span class="text-[10px] font-bold tracking-tight truncate w-full px-0.5">{{ cat.name }}</span>
+              <span class="text-[9px] font-bold tracking-tight truncate w-full px-0.5">{{ cat.name }}</span>
             </button>
           </div>
         </div>
